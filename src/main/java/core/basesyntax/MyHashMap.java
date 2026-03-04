@@ -17,11 +17,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         if (filledSize >= threshold) {
             resize();
         }
-
         int hash = (key == null) ? 0 : key.hashCode();
+        int position = hash & (table.length - 1);
 
         Node<K, V> newNode = new Node<>(hash, key, value, null);
-        int position = calculatePosition(key);
 
         if (table[position] == null) {
             table[position] = newNode;
@@ -30,20 +29,18 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
 
         Node<K, V> current = table[position];
+        Node<K, V> prev = null;
 
-        while (current.next != null) {
+        while (current != null) {
             if (Objects.equals(current.key, key)) {
                 current.value = value;
                 return;
             }
+            prev = current;
             current = current.next;
         }
-        if (Objects.equals(current.key, key)) {
-            current.value = value;
-        } else {
-            current.next = newNode;
-            filledSize++;
-        }
+        prev.next = newNode;
+        filledSize++;
     }
 
     @Override
